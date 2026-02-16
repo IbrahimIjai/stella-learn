@@ -20,3 +20,22 @@ This repository uses the recommended structure for a Soroban project:
 - If you initialized this project with any other example contracts via `--with-example`, those contracts will be in the `contracts` directory as well.
 - Contracts should have their own `Cargo.toml` files that rely on the top-level `Cargo.toml` workspace for their dependencies.
 - Frontend libraries can be added to the top-level directory as well. If you initialized this project with a frontend template via `--frontend-template` you will have those files already included.
+
+
+### cmds:
+
+1. 
+stellar contract build
+
+2.
+cargo test
+
+3. 
+stellar contract optimize --wasm target/wasm32v1-none/release/crowdfund.wasm
+
+4. 
+stellar contract deploy \
+  --wasm target/wasm32v1-none/release/crowdfund.wasm \
+  --source-account alice \
+  --network testnet \
+  --alias crowdfund
