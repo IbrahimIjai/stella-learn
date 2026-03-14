@@ -18,6 +18,9 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  ssr: {
+    noExternal: ['@stellar/stellar-sdk', '@creit-tech/stellar-wallets-kit']
+  }
 })
 
 export default config
