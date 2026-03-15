@@ -30,7 +30,7 @@ We have implemented and verified 4 core logic tests for the crowdfunding contrac
 
 ## 🎥 Demo Video
 Check out the 1-minute walkthrough showing campaign creation, funding, and real-time updates:
-👉 [Watch Demo Video Here](LINK_TO_YOUR_VIDEO_HERE)
+👉 [Watch Demo Video Here](https://youtu.be/w9Nok_dycAQ)
 
 ## 🔧 Installation & Setup
 1. **Contracts**:
@@ -52,5 +52,5 @@ Check out the 1-minute walkthrough showing campaign creation, funding, and real-
 
 ---
 **Submission for Stellar Learn Level 3**
-[Your Name/Username]
+@sundayibrahim-ijai
 MARCH 2026

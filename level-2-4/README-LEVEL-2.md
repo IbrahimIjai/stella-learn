@@ -74,4 +74,4 @@ The application handles several critical error states:
 3. **Contract Logic**: Visual feedback for invalid token addresses, insufficient balances, or failed simulations.
 
 ---
-Built with 🚀 by [Your Username/Name] for Stellar Learn Level 2.
+Built with 🚀 by @sundayibrahim-ijai for Stellar Learn Level 2.
