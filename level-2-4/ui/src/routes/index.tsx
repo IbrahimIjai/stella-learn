@@ -58,16 +58,31 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between mx-auto px-4 md:px-8">
-          <div className="flex items-center gap-3">
-             <div className="relative group">
-                <div className="absolute -inset-1 rounded-full bg-primary opacity-40 blur transition group-hover:opacity-75"></div>
-                <Logo className="h-9 w-9 relative bg-background rounded-full p-1" />
-             </div>
-             <h1 className="text-2xl font-black tracking-tighter text-primary transition-all duration-300">s-metadao</h1>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center justify-between mx-auto px-4 md:px-8">
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+               <div className="relative">
+                  <Logo className="h-7 w-7 relative" />
+               </div>
+               <h1 className="text-xl font-black tracking-tighter text-primary uppercase">s-metadao</h1>
+            </Link>
+            
+            <nav className="hidden md:flex items-center gap-6">
+              <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-primary">Discover</Link>
+              <a href="#" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">Governance</a>
+              <a href="#" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">Ecosystem</a>
+            </nav>
           </div>
-          <WalletConnector />
+
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:block">
+              <WalletConnector />
+            </div>
+            <div className="sm:hidden">
+              <WalletConnector />
+            </div>
+          </div>
         </div>
       </header>
 
@@ -129,7 +144,7 @@ function App() {
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary">Network Status:</span>
                   <span className="text-[11px] font-bold">Scanning for active metadata components on Stellar...</span>
-                  <div className="h-4 w-[1px] bg-border mx-2" />
+                  <div className="h-4 w-px bg-border mx-2" />
                 </div>
               )}
             </div>

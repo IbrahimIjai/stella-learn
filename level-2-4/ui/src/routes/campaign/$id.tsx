@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -146,19 +146,27 @@ function CampaignDetail() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between mx-auto px-4 md:px-8">
           <div className="flex items-center gap-4">
-             <button 
+            <button 
                onClick={() => window.history.back()} 
                className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-full hover:bg-muted"
                aria-label="Go back"
              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
              </button>
-             <div className="flex items-center gap-2.5 border-l border-border/50 pl-3.5">
-                <Logo className="h-5 w-5" />
-                <span className="text-[12px] font-black tracking-tighter uppercase text-primary">s-metadao</span>
+             
+             <div className="flex items-center gap-6 border-l border-border/50 pl-3.5">
+                <Link to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+                  <Logo className="h-5 w-5" />
+                  <span className="text-[12px] font-black tracking-tighter uppercase text-primary">s-metadao</span>
+                </Link>
+                
+                <nav className="hidden md:flex items-center gap-6 pl-4">
+                  <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">Discover</Link>
+                  <a href="#" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">Governance</a>
+                </nav>
              </div>
           </div>
           <WalletConnector />

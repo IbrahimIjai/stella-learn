@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Production
+dist
+
+# Misc
+.DS_Store
+*.pem
+
+# IDEs
+.idea
+.vscode
+*.swp
+*.swo
+
+# Soroban
+target/
+.soroban/
+crowdfund/
+
+# Local env files
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dev.log
