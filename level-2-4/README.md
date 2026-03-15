@@ -1,57 +1,47 @@
-# s-metadao | Stellar Learn Level 3 Submission
+# s-metadao | Stellar Learn Level 4 (Production Readiness)
 
-**s-metadao** is a decentralized metadata-driven crowdfunding platform built on the Stellar Network. This repository contains the complete implementation, documentation, and tests for the Level 3 certification.
+![Build Status](https://github.com/@sundayibrahim-ijai/s-metadao/actions/workflows/ci.yml/badge.svg)
 
-## 🚀 Overview
-s-metadao goes beyond simple payments, implementing a full campaign lifecycle on-chain. Admins can create campaigns with specific funding targets using any Soroban token (defaulting to our native Meta Token). The hub provides real-time progress tracking, event synchronization, and a premium user experience.
+**s-metadao** is a production-hardened, metadata-driven crowdfunding platform. This Level 4 submission focuses on advanced contract patterns, inter-contract communication, and enterprise-grade CI/CD pipelines.
 
-## ✨ Level 3 Features
-- **Smart Contract Core**: Implemented robust crowdfunding logic with isolation between campaigns.
-- **Real-time Synchronization**: Frontend state remains in sync with on-chain data using `tanstack-query` and background polling.
-- **Glassmorphism UI**: High-fidelity dark mode with ambient glow and rich feedback toasts.
-- **Two-Step Creation**: Guided UX for campaign deployment.
+## 🚀 Level 4 Advanced Features
+- **Inter-Contract Communication**: The Crowdfund engine core implements advanced patterns by orchestrating calls to the Stellar Token contracts (minting/transferring) during the funding lifecycle.
+- **Production CI/CD**: Fully automated pipeline via GitHub Actions that validates both the Soroban contract logic and the React frontend on every push.
+- **Advanced Event Streaming**: Real-time optimistic UI updates combined with RPC polling for robust state synchronization.
+- **Full Production Responsiveness**: Optimized mobile experience with custom-built glassmorphic components that scale from small handsets to 4K displays.
 
-## 📦 Deployment Info
-- **Live Demo**: [smeta-dao.vercel.app](https://smeta-dao.vercel.app/)
+## 📦 Deployment & Production Info
+- **Live Production URL**: [smeta-dao.vercel.app](https://smeta-dao.vercel.app/)
 - **Network**: Stellar Testnet
-- **Crowdfund Contract**: `CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z`
-- **Native Meta Token**: `CCELBQQHO3TMNSYOGO6CIRQML7J2SMJLTWFKISNUHIBIAESGL5KTWO76`
-- **Example Transaction**: `df880c10257e5e01c13f6a92e665fbd7ff38...`
+- **Crowdfund Master Contract**: `CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z`
+- **Custom Native Token**: `CCELBQQHO3TMNSYOGO6CIRQML7J2SMJLTWFKISNUHIBIAESGL5KTWO76` (MetaToken)
 
-## 🧪 Testing Coverage
-We have implemented and verified 4 core logic tests for the crowdfunding contract:
-1. `test_deposit_and_withdraw`: Verifies the full funding and withdrawal cycle.
-2. `test_deposit_invalid_campaign`: Ensures error handling for non-existent hubs.
-3. `test_withdraw_invalid_campaign`: Prevents unauthorized or invalid withdrawals.
-4. `test_multiple_campaigns_isolation`: Validates that funds and states are strictly isolated across multiple concurrent projects.
+## 🔄 Inter-Contract Calls
+The `deposit` and `withdraw` functions in our Crowdfund contract utilize the Soroban Token Interface to interact with external tokens:
+```rust
+// Inter-contract call example in deposit():
+let client = soroban_sdk::token::Client::new(&env, &campaign.token);
+client.transfer(&user, &env.current_contract_address(), &amount);
+```
 
-### Test Output
-![Test Output Placeholder](./ui/public/test-output.png)
-*(Run `cargo test` in `crowdfund-contracts/contracts/crowdfund` to reproduce)*
+## 🧪 CI/CD Pipeline
+Our GitHub Actions workflow (`.github/workflows/ci.yml`) ensures production quality:
+- **Contract Integrity**: Runs Rust test suites on every pull request.
+- **Frontend Validation**: Verifies production builds and linting before deployment.
+- **WASM Verification**: Ensures contracts build correctly for the `wasm32-unknown-unknown` target.
 
-## 🎥 Demo Video
-Check out the 1-minute walkthrough showing campaign creation, funding, and real-time updates:
-👉 [Watch Demo Video Here](https://youtu.be/w9Nok_dycAQ)
+### Pipeline Status
+![CI/CD Workflow Placeholder](./ui/public/cicd-status.png)
 
-## 🔧 Installation & Setup
-1. **Contracts**:
-   ```bash
-   cd crowdfund-contracts
-   stellar contract build
-   ```
-2. **Frontend**:
-   ```bash
-   cd ui
-   pnpm install
-   pnpm dev
-   ```
+## 📱 Mobile Experience
+- **Fluid Layouts**: Tailwind-powered responsive design.
+- **Touch-Optimized**: Custom wallet interaction flows designed for mobile browsers.
+- **Ambient Glow**: Performance-optimized CSS blurs that look stunning on retina displays without draining battery.
 
-## 🛡 Performance & Caching
-- **Query Caching**: Used `tanstack-query` for optimized data fetching and state management.
-- **Poll Synchronization**: Implemented efficient RPC polling for transaction confirmation status.
-- **Rich Feedback**: Integrated `sonner` with rich-color states for instant transaction lifecycle visibility.
+### Mobile View Screenshot
+![Mobile View Placeholder](./ui/public/mobile-view.png)
 
 ---
-**Submission for Stellar Learn Level 3**
+**Advanced Submission for Stellar Learn Level 4**
 @sundayibrahim-ijai
 MARCH 2026
