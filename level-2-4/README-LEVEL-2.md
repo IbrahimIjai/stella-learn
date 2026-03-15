@@ -21,6 +21,7 @@ s-metadao allows users to create, discover, and fund high-impact projects using 
 - **Toasts**: Sonner with rich color states.
 
 ## 📦 Deployment Info
+- **Live Demo**: [smeta-dao.vercel.app](https://smeta-dao.vercel.app/)
 - **Main Crowdfund Contract ID**: `CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z`
 - **Native Meta Token ID**: `CCELBQQHO3TMNSYOGO6CIRQML7J2SMJLTWFKISNUHIBIAESGL5KTWO76`
 - **Network**: Stellar Testnet

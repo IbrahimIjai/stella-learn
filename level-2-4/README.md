@@ -12,6 +12,7 @@ s-metadao goes beyond simple payments, implementing a full campaign lifecycle on
 - **Two-Step Creation**: Guided UX for campaign deployment.
 
 ## 📦 Deployment Info
+- **Live Demo**: [smeta-dao.vercel.app](https://smeta-dao.vercel.app/)
 - **Network**: Stellar Testnet
 - **Crowdfund Contract**: `CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z`
 - **Native Meta Token**: `CCELBQQHO3TMNSYOGO6CIRQML7J2SMJLTWFKISNUHIBIAESGL5KTWO76`
