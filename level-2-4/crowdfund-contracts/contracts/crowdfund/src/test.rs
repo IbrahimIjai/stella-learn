@@ -41,7 +41,13 @@ fn setup_campaign<'a>() -> (
     let contract_id = env.register(CrowdfundContract, ());
     let client = CrowdfundContractClient::new(&env, &contract_id);
 
-    let campaign_id = client.create_campaign(&admin, &token_id);
+    let campaign_id = client.create_campaign(
+        &admin,
+        &token_id,
+        &String::from_str(&env, "Test Project"),
+        &String::from_str(&env, "Test Description"),
+        &1000,
+    );
 
     (
         env,
@@ -110,8 +116,20 @@ fn test_multiple_campaigns_isolation() {
     let client = CrowdfundContractClient::new(&env, &contract_id);
 
     // Create two campaigns
-    let id1 = client.create_campaign(&admin1, &token_id);
-    let id2 = client.create_campaign(&admin2, &token_id);
+    let id1 = client.create_campaign(
+        &admin1,
+        &token_id,
+        &String::from_str(&env, "Project 1"),
+        &String::from_str(&env, "Desc 1"),
+        &100,
+    );
+    let id2 = client.create_campaign(
+        &admin2,
+        &token_id,
+        &String::from_str(&env, "Project 2"),
+        &String::from_str(&env, "Desc 2"),
+        &200,
+    );
 
     // Deposit to #1
     client.deposit(&user1, &id1, &50);

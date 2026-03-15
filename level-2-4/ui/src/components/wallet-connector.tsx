@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { stellar } from "@/lib/stellar-helper";
+import type { KitEventStateUpdated } from "@creit-tech/stellar-wallets-kit/types";
 
 export default function WalletConnector() {
   const [address, setAddress] = useState<string | undefined>();
@@ -14,7 +15,7 @@ export default function WalletConnector() {
       
       await stellar.getAddress().catch(() => {}); // Check if already connected without forcing modal
       
-      const unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, (event: any) => {
+      const unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, (event: KitEventStateUpdated) => {
         setAddress(event.payload.address);
       });
 

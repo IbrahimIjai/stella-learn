@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@creit-tech/stellar-wallets-kit/styles.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -136,6 +137,14 @@
   .animate-spin-slow {
     animation: spin 8s linear infinite;
   }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @keyframes spin {

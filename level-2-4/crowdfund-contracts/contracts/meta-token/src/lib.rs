@@ -27,7 +27,7 @@ impl MetaToken {
     }
 }
 
-#[contractimpl(contracttrait)]
+#[contractimpl]
 impl FungibleToken for MetaToken {
     type ContractType = Base;
 
@@ -46,7 +46,7 @@ impl FungibleToken for MetaToken {
 // Extensions
 //
 
-#[contractimpl(contracttrait)]
+#[contractimpl]
 impl FungibleBurnable for MetaToken {
     #[when_not_paused]
     fn burn(e: &Env, from: Address, amount: i128) {
@@ -63,7 +63,7 @@ impl FungibleBurnable for MetaToken {
 // Utils
 //
 
-#[contractimpl(contracttrait)]
+#[contractimpl]
 impl Ownable for MetaToken {}
 
 #[contractimpl]

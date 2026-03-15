@@ -1,22 +1,25 @@
-/**
- * Stellar Helper - Blockchain Logic with Stellar Wallets Kit
- * Modified to bypass Vite/Nitro SSR issues by loading StellarSDK dependencies lazily.
- */
-
-// Types can be statically imported safely
 import type * as StellarSdkType from "@stellar/stellar-sdk";
 import type {
   StellarWalletsKit as StellarWalletsKitType,
 } from "@creit-tech/stellar-wallets-kit/sdk";
+import type { 
+  ModuleInterface, 
+  Networks,
+  SwkAppTheme
+} from "@creit-tech/stellar-wallets-kit/types";
 
 
-export const CROWDFUND_CONTRACT_ID = "CDSZUEZN5XEEORSDRFBQVQQJOYRXH7AOEIMSMZTF5KBH3AKCJAHIKOID";
+export const CROWDFUND_CONTRACT_ID = "CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z";
 
 export interface Campaign {
   id: number;
   admin: string;
   token: string;
+  name: string;
+  description: string;
+  target_amount: bigint;
   balance: bigint;
+  total_raised: bigint;
 }
 
 let _kitInitialized = false;
@@ -27,20 +30,22 @@ async function getSdk(): Promise<typeof StellarSdkType> {
 
 async function getKit(): Promise<{
   StellarWalletsKit: typeof StellarWalletsKitType,
-  allowAllModules: any
+  allowAllModules: () => ModuleInterface[],
+  SwkAppDarkTheme: SwkAppTheme
 }> {
   const sdkModule = await import("@creit-tech/stellar-wallets-kit/sdk");
   const utilsModule = await import("@creit-tech/stellar-wallets-kit/modules/utils");
+  const typesModule = await import("@creit-tech/stellar-wallets-kit/types");
   
   return {
     StellarWalletsKit: sdkModule.StellarWalletsKit,
-    allowAllModules: utilsModule.defaultModules 
+    allowAllModules: utilsModule.defaultModules,
+    SwkAppDarkTheme: typesModule.SwkAppDarkTheme
   };
 }
 
 export class StellarHelper {
   private networkMode: "testnet" | "mainnet";
-  private networkPassphrase: Promise<string> | string = "";
 
   constructor(network: "testnet" | "mainnet" = "testnet") {
     this.networkMode = network;
@@ -69,8 +74,9 @@ export class StellarHelper {
     const passphrase = await this.getPassphrase();
 
     kitModules.StellarWalletsKit.init({
-      network: passphrase as any,
+      network: passphrase as unknown as Networks,
       modules: kitModules.allowAllModules(),
+      theme: kitModules.SwkAppDarkTheme,
     });
     
     _kitInitialized = true;
@@ -132,15 +138,18 @@ export class StellarHelper {
       // Extract details from scVal
       const returnValue = sdk.scValToNative(result.retval);
       
-      // Expected native type from struct: { admin: string, token: string, balance: bigint }
       return {
         id,
         admin: returnValue.admin,
         token: returnValue.token,
-        balance: BigInt(returnValue.balance)
+        name: returnValue.name.toString(),
+        description: returnValue.description.toString(),
+        target_amount: BigInt(returnValue.target_amount),
+        balance: BigInt(returnValue.balance),
+        total_raised: BigInt(returnValue.total_raised)
       };
-    } catch (e: any) {
-      if (e.message?.includes("Campaign does not exist")) {
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message?.includes("Campaign does not exist")) {
         return null;
       }
       return null;
@@ -172,7 +181,13 @@ export class StellarHelper {
     return campaigns;
   }
 
-  async createCampaign(admin: string, token: string): Promise<string> {
+  async createCampaign(
+    admin: string, 
+    token: string, 
+    name: string, 
+    description: string, 
+    targetAmountStr: string
+  ): Promise<string> {
     const sdk = await getSdk();
     const rpc = await this.getRpcServer();
     const passphrase = await this.getPassphrase();
@@ -182,10 +197,15 @@ export class StellarHelper {
     
     const contract = new sdk.Contract(CROWDFUND_CONTRACT_ID);
     
-    // admin, token
+    const targetAmount = BigInt(Math.floor(parseFloat(targetAmountStr) * 1e7));
+
+    // admin, token, name, description, target_amount
     const args = [
       sdk.nativeToScVal(admin, { type: "address" }),
-      sdk.nativeToScVal(token, { type: "address" })
+      sdk.nativeToScVal(token, { type: "address" }),
+      sdk.nativeToScVal(name, { type: "string" }),
+      sdk.nativeToScVal(description, { type: "string" }),
+      sdk.nativeToScVal(targetAmount, { type: "i128" }),
     ];
 
     const source = await rpc.getAccount(admin);
@@ -217,7 +237,7 @@ export class StellarHelper {
       throw new Error("Transaction submission failed");
     }
 
-    return await this.pollTransaction(response.hash);
+    return response.hash;
   }
 
   async deposit(user: string, campaignId: number, amountStr: string): Promise<string> {
@@ -230,8 +250,6 @@ export class StellarHelper {
     
     const contract = new sdk.Contract(CROWDFUND_CONTRACT_ID);
     
-    // We convert the string amount (e.g. "100") to i128 representing units
-    // e.g. 100 XLM is 100 * 10^7 stroops
     const amount = BigInt(Math.floor(parseFloat(amountStr) * 1e7));
 
     const args = [
@@ -264,7 +282,7 @@ export class StellarHelper {
       throw new Error("Transaction submission failed");
     }
 
-    return await this.pollTransaction(response.hash);
+    return response.hash;
   }
 
   async withdraw(admin: string, campaignId: number, recipient: string): Promise<string> {
@@ -306,10 +324,10 @@ export class StellarHelper {
       throw new Error("Transaction submission failed");
     }
 
-    return await this.pollTransaction(response.hash);
+    return response.hash;
   }
 
-  private async pollTransaction(hash: string): Promise<string> {
+  async pollTransaction(hash: string): Promise<string> {
     const rpc = await this.getRpcServer();
     let status = await rpc.getTransaction(hash);
     let attempts = 0;

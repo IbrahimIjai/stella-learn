@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
+import type { KitEventStateUpdated } from "@creit-tech/stellar-wallets-kit/types"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +41,7 @@ function CampaignDetail() {
         // Not logged in
       }
 
-      const unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, (event: any) => {
+      const unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, (event: KitEventStateUpdated) => {
         setAddress(event.payload.address);
       });
       const unsubDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
@@ -69,34 +70,50 @@ function CampaignDetail() {
       if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
         throw new Error("Invalid amount")
       }
-      return await stellar.deposit(address, campaignId, amount)
+      
+      const hash = await stellar.deposit(address, campaignId, amount)
+      return stellar.pollTransaction(hash)
+    },
+    onMutate: () => {
+       toast.loading("Submitting deposit...", { id: "deposit" })
     },
     onSuccess: (txHash) => {
-      toast.success("Deposit successful!", {
-        description: `Tx Hash: ${txHash.slice(0, 10)}...`,
+      toast.success("Deposit confirmed!", {
+        id: "deposit",
+        description: `Tx: ${txHash.slice(0, 10)}...`,
       })
       queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] })
       setAmount("")
     },
-    onError: (error: any) => {
-      toast.error("Deposit failed", { description: error.message })
+    onError: (error: unknown) => {
+      toast.error("Deposit failed", { 
+        id: "deposit",
+        description: error instanceof Error ? error.message : "Unknown error" 
+      })
     },
   })
 
   const withdrawMutation = useMutation({
     mutationFn: async () => {
       if (!address) throw new Error("Wallet not connected")
-      // Admins withdraw to themselves in this simple UI
-      return await stellar.withdraw(address, campaignId, address)
+      const hash = await stellar.withdraw(address, campaignId, address)
+      return stellar.pollTransaction(hash)
+    },
+    onMutate: () => {
+       toast.loading("Initiating withdrawal...", { id: "withdraw" })
     },
     onSuccess: (txHash) => {
       toast.success("Withdrawal successful!", {
-        description: `Tx Hash: ${txHash.slice(0, 10)}...`,
+        id: "withdraw",
+        description: `Tx: ${txHash.slice(0, 10)}...`,
       })
       queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] })
     },
-    onError: (error: any) => {
-      toast.error("Withdrawal failed", { description: error.message })
+    onError: (error: unknown) => {
+      toast.error("Withdrawal failed", { 
+        id: "withdraw",
+        description: error instanceof Error ? error.message : "Unknown error" 
+      })
     },
   })
 
@@ -141,7 +158,7 @@ function CampaignDetail() {
              </button>
              <div className="flex items-center gap-2.5 border-l border-border/50 pl-3.5">
                 <Logo className="h-5 w-5" />
-                <span className="text-[12px] font-black tracking-tighter uppercase bg-clip-text text-transparent bg-linear-to-r from-[#8B5CF6] to-[#06B6D4]">s-metadao</span>
+                <span className="text-[12px] font-black tracking-tighter uppercase text-primary">s-metadao</span>
              </div>
           </div>
           <WalletConnector />
@@ -150,36 +167,62 @@ function CampaignDetail() {
 
       <main className="flex-1 container mx-auto px-4 md:px-8 py-8 md:py-12 flex justify-center">
         <Card className="w-full max-w-3xl border-2 shadow-sm">
-          <CardHeader className="bg-secondary/10 pb-6">
+          <CardHeader className="bg-secondary/10 pb-6 border-b">
             <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-2xl font-black tracking-tighter mb-1 uppercase">
-                  Campaign #{campaign.id}
+              <div className="space-y-1">
+                <CardTitle className="text-3xl font-black tracking-tighter uppercase leading-none">
+                  {campaign.name}
                 </CardTitle>
-                <CardDescription className="text-[11px] font-medium tracking-tight">
-                  Transparent, decentralized fundraising on Soroban.
+                <CardDescription className="text-xs font-medium tracking-tight text-muted-foreground/80">
+                  {campaign.description}
                 </CardDescription>
+                <div className="flex items-center gap-2 pt-1">
+                   <Badge variant="outline" className="text-[8px] uppercase font-bold tracking-widest px-1.5 py-0">ID: {campaign.id}</Badge>
+                   {isAdmin && (
+                     <Badge variant="default" className="text-[8px] uppercase font-black px-1.5 py-0 tracking-widest bg-primary/20 text-primary border-0">
+                       Admin Control
+                     </Badge>
+                   )}
+                </div>
               </div>
-              {isAdmin && (
-                <Badge variant="default" className="text-[9px] uppercase font-black px-2 py-0.5 tracking-widest leading-none">
-                  Admin
-                </Badge>
-              )}
             </div>
           </CardHeader>
           <CardContent className="pt-8 grid gap-8">
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1 p-5 rounded-lg bg-primary/5 border border-primary/20">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                  Total Raised
-                </span>
-                <span className="text-4xl font-mono font-black text-primary tracking-tighter">
-                  {formatBalance(campaign.balance)}
-                </span>
-                <span className="text-[10px] text-muted-foreground/70 font-medium">
-                   Current contract liquidity
-                </span>
+              <div className="flex flex-col gap-4 p-5 rounded-lg bg-primary/5 border border-primary/20">
+                <div className="flex justify-between items-end">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                    Funding Progress
+                  </span>
+                  <span className="text-[10px] font-black text-primary uppercase">
+                    {Math.min(100, Math.round((Number(campaign.total_raised) / Number(campaign.target_amount)) * 100))}%
+                  </span>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="text-4xl font-mono font-black text-primary tracking-tighter leading-none">
+                    {formatBalance(campaign.total_raised)} 
+                    <span className="text-xs font-normal text-muted-foreground ml-2">/ {formatBalance(campaign.target_amount)}</span>
+                  </div>
+                  <div className="bg-muted/40 h-1.5 w-full rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary"
+                      style={{ width: `${Math.min(100, (Number(campaign.total_raised) / Number(campaign.target_amount)) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                   <div className="space-y-0.5">
+                      <div className="text-[8px] uppercase font-black text-muted-foreground/60 tracking-widest leading-none">In Contract (Unlocked)</div>
+                      <div className="text-sm font-mono font-bold">{formatBalance(campaign.balance)} <span className="text-[9px] font-normal">Tokens</span></div>
+                   </div>
+                   <div className="space-y-0.5 text-right">
+                      <div className="text-[8px] uppercase font-black text-muted-foreground/60 tracking-widest leading-none">Target Goal</div>
+                      <div className="text-sm font-mono font-bold">{formatBalance(campaign.target_amount)} <span className="text-[9px] font-normal">Tokens</span></div>
+                   </div>
+                </div>
               </div>
               
               <div className="flex flex-col gap-3 p-5 rounded-lg border bg-muted/20">
@@ -222,7 +265,7 @@ function CampaignDetail() {
                     <Button 
                       onClick={() => depositMutation.mutate()} 
                       disabled={depositMutation.isPending || !amount || !address}
-                      className="whitespace-nowrap w-24 text-[10px] font-black uppercase tracking-wider h-8 bg-linear-to-r from-[#8B5CF6] to-[#06B6D4]"
+                      className="whitespace-nowrap w-24 text-[10px] font-black uppercase tracking-wider h-8 bg-primary text-primary-foreground"
                     >
                       {depositMutation.isPending ? "..." : "Deposit"}
                     </Button>
