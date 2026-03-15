@@ -1,62 +1,46 @@
 import { useEffect, useState } from "react";
-import { StellarWalletsKit } from "@creit-tech/stellar-wallets-kit/sdk";
-import {
-  SwkAppDarkTheme,
-  KitEventType,
-} from "@creit-tech/stellar-wallets-kit/types";
-import { defaultModules } from "@creit-tech/stellar-wallets-kit/modules/utils";
 import { Button } from "@/components/ui/button";
-
-// Initialize the kit once (module-level, runs in browser only)
-let kitInitialized = false;
-function ensureKitInit() {
-  if (kitInitialized) return;
-  StellarWalletsKit.init({
-    theme: SwkAppDarkTheme,
-    modules: defaultModules(),
-  });
-  kitInitialized = true;
-}
+import { stellar } from "@/lib/stellar-helper";
 
 export default function WalletConnector() {
   const [address, setAddress] = useState<string | undefined>();
 
   useEffect(() => {
-    ensureKitInit();
-
-    // Listen for state updates (wallet connected, address changed, etc.)
-    const unsubState = StellarWalletsKit.on(
-      KitEventType.STATE_UPDATED,
-      (event) => {
+    let unsubs: (() => void)[] = [];
+    
+    const initAndListen = async () => {
+      const { StellarWalletsKit } = await import("@creit-tech/stellar-wallets-kit/sdk");
+      const { KitEventType } = await import("@creit-tech/stellar-wallets-kit/types");
+      
+      await stellar.getAddress().catch(() => {}); // Check if already connected without forcing modal
+      
+      const unsubState = StellarWalletsKit.on(KitEventType.STATE_UPDATED, (event: any) => {
         setAddress(event.payload.address);
-      }
-    );
+      });
 
-    // Listen for disconnect events
-    const unsubDisconnect = StellarWalletsKit.on(
-      KitEventType.DISCONNECT,
-      () => {
+      const unsubDisconnect = StellarWalletsKit.on(KitEventType.DISCONNECT, () => {
         setAddress(undefined);
-      }
-    );
+      });
+
+      unsubs.push(unsubState, unsubDisconnect);
+    };
+
+    initAndListen();
 
     return () => {
-      unsubState();
-      unsubDisconnect();
+      unsubs.forEach(unsub => unsub());
     };
   }, []);
 
   async function handleClick() {
-    ensureKitInit();
-
+    const { StellarWalletsKit } = await import("@creit-tech/stellar-wallets-kit/sdk");
+    
     if (address) {
-      // User is already connected — show the profile modal
       await StellarWalletsKit.profileModal();
     } else {
-      // User is not connected — show the auth/connect modal
       try {
-        const { address: newAddress } = await StellarWalletsKit.authModal();
-        setAddress(newAddress);
+        const addr = await stellar.connectWallet();
+        setAddress(addr);
       } catch {
         // User closed the modal, do nothing
       }
@@ -68,7 +52,7 @@ export default function WalletConnector() {
     : "Connect Wallet";
 
   return (
-    <Button onClick={handleClick} variant="outline" size="lg">
+    <Button onClick={handleClick} variant="outline" size="sm" className="text-[12px] font-bold tracking-tight px-3 h-8">
       {label}
     </Button>
   );

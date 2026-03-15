@@ -1,0 +1,3 @@
+src/lib/stellar-helper.ts(43,11): error TS6133: 'networkPassphrase' is declared but its value is never read.
+src/routes/campaign/$id.tsx(4,1): error TS6133: 'KitEventTypeType' is declared but its value is never read.
+src/routes/campaign/$id.tsx(8,46): error TS6133: 'CardFooter' is declared but its value is never read.

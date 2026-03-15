@@ -8,7 +8,11 @@ pub struct CrowdfundContract;
 pub struct Campaign {
     pub admin: Address,
     pub token: Address,
+    pub name: String,
+    pub description: String,
+    pub target_amount: i128,
     pub balance: i128,
+    pub total_raised: i128,
 }
 
 #[contracttype]
@@ -20,7 +24,14 @@ pub enum DataKey {
 #[contractimpl]
 impl CrowdfundContract {
     // Create a new campaign. Returns the campaign ID.
-    pub fn create_campaign(env: Env, admin: Address, token: Address) -> u64 {
+    pub fn create_campaign(
+        env: Env,
+        admin: Address,
+        token: Address,
+        name: soroban_sdk::String,
+        description: soroban_sdk::String,
+        target_amount: i128,
+    ) -> u64 {
         // Generate new ID
         let count: u64 = env.storage().instance().get(&DataKey::Count).unwrap_or(0);
         let id = count + 1;
@@ -29,7 +40,11 @@ impl CrowdfundContract {
         let campaign = Campaign {
             admin,
             token,
+            name,
+            description,
+            target_amount,
             balance: 0,
+            total_raised: 0,
         };
         env.storage()
             .persistent()
@@ -56,6 +71,7 @@ impl CrowdfundContract {
 
         // Update internal balance
         campaign.balance += amount;
+        campaign.total_raised += amount;
         env.storage()
             .persistent()
             .set(&DataKey::Campaign(campaign_id), &campaign);

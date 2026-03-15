@@ -1,0 +1,28 @@
+
+> ui@ dev C:\Users\USER\Desktop\wek wek wek wek\whizness\looking-for-guiding-money\stella-learn\level-2-4\ui
+> vite dev --port 3000
+
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::42069
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at ServerEventBus.start (file:///C:/Users/USER/Desktop/wek%20wek%20wek%20wek/whizness/looking-for-guiding-money/stella-learn/level-2-4/ui/node_modules/.pnpm/@tanstack+devtools-event-bu_08997dfe5cfb6fff980fe0c9eb9721e1/node_modules/@tanstack/devtools-event-bus/dist/esm/server/server.js:155:12)
+    at BasicMinimalPluginContext.configureServer (file:///C:/Users/USER/Desktop/wek%20wek%20wek%20wek/whizness/looking-for-guiding-money/stella-learn/level-2-4/ui/node_modules/.pnpm/@tanstack+devtools-vite@0.3_85d2835358ba66fba8be89ad3ac255e8/node_modules/@tanstack/devtools-vite/dist/esm/plugin.js:52:15)
+    at _createServer (file:///C:/Users/USER/Desktop/wek%20wek%20wek%20wek/whizness/looking-for-guiding-money/stella-learn/level-2-4/ui/node_modules/.pnpm/vite@7.3.1_@types+node@22.1_a2456226c4c9e7610e9348aca3e3e1d2/node_modules/vite/dist/node/chunks/config.js:25603:97)
+    at async CAC.<anonymous> (file:///C:/Users/USER/Desktop/wek%20wek%20wek%20wek/whizness/looking-for-guiding-money/stella-learn/level-2-4/ui/node_modules/.pnpm/vite@7.3.1_@types+node@22.1_a2456226c4c9e7610e9348aca3e3e1d2/node_modules/vite/dist/node/cli.js:572:18)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1973:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 42069
+}
+
+Node.js v23.9.0
+ ELIFECYCLE  Command failed with exit code 1.
