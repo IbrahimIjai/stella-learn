@@ -1,0 +1,50 @@
+name: Level-2-4 CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "level-2-4/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "level-2-4/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  ui-verification:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: level-2-4/ui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: level-2-4/ui/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run tests
+        run: pnpm test -- --passWithNoTests
+      - name: Build UI
+        run: pnpm build
+
+  contract-testing:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: level-2-4/crowdfund-contracts/contracts/crowdfund
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Run contract tests
+        run: cargo test
