@@ -1,6 +1,8 @@
 # s-metadao | Stellar Learn Level 4 (Production Readiness)
 
-![Build Status](https://github.com/@sundayibrahim-ijai/s-metadao/actions/workflows/ci.yml/badge.svg)
+![Build Status](https://github.com/ibrahimijai/stella-learn/actions/workflows/ci.yml/badge.svg)
+[![Stellar Network](https://img.shields.io/badge/Network-Stellar%20Testnet-08B5E5?style=flat&logo=stellar)](https://stellar.org)
+[![Platform](https://img.shields.io/badge/Platform-Vercel-black?style=flat&logo=vercel)](https://smeta-dao.vercel.app/)
 
 **s-metadao** is a production-hardened, metadata-driven crowdfunding platform. This Level 4 submission focuses on advanced contract patterns, inter-contract communication, and enterprise-grade CI/CD pipelines.
 
@@ -15,9 +17,10 @@
 - **Network**: Stellar Testnet
 - **Crowdfund Master Contract**: `CCURLBN3XVEEDAGANTSZLGINA2NDLMPXTNCOTLVFUI76BBWQCENMYK6Z`
 - **Custom Native Token**: `CCELBQQHO3TMNSYOGO6CIRQML7J2SMJLTWFKISNUHIBIAESGL5KTWO76` (MetaToken)
+- **Verified Inter-Contract Tx**: `bd4b3b7d51ffd8e9b3ab9d8b4c19d12ffaf284873b72b15eb024ae3925017f51`
 
 ## 🔄 Inter-Contract Calls
-The `deposit` and `withdraw` functions in our Crowdfund contract utilize the Soroban Token Interface to interact with external tokens:
+The `deposit` and `withdraw` functions in our Crowdfund contract utilize the Soroban Token Interface to interact with external tokens (MetaToken):
 ```rust
 // Inter-contract call example in deposit():
 let client = soroban_sdk::token::Client::new(&env, &campaign.token);
@@ -25,23 +28,20 @@ client.transfer(&user, &env.current_contract_address(), &amount);
 ```
 
 ## 🧪 CI/CD Pipeline
-Our GitHub Actions workflow (`.github/workflows/ci.yml`) ensures production quality:
-- **Contract Integrity**: Runs Rust test suites on every pull request.
-- **Frontend Validation**: Verifies production builds and linting before deployment.
-- **WASM Verification**: Ensures contracts build correctly for the `wasm32-unknown-unknown` target.
+Our GitHub Actions workflow ensures production quality by running Rust tests and verifying the React production build before deployment.
 
 ### Pipeline Status
-![CI/CD Workflow Placeholder](./ui/public/cicd-status.png)
+![CI/CD Pipeline Success Status](./level-2-4/ui/public/screenshots/cicd-status.png)
 
 ## 📱 Mobile Experience
 - **Fluid Layouts**: Tailwind-powered responsive design.
 - **Touch-Optimized**: Custom wallet interaction flows designed for mobile browsers.
-- **Ambient Glow**: Performance-optimized CSS blurs that look stunning on retina displays without draining battery.
+- **Ambient Glow**: Performance-optimized CSS blurs that look stunning on retina displays.
 
 ### Mobile View Screenshot
-![Mobile View Placeholder](./ui/public/mobile-view.png)
+![Mobile View Screenshot](./level-2-4/ui/public/screenshots/mobile-view.png)
 
 ---
 **Advanced Submission for Stellar Learn Level 4**
-@sundayibrahim-ijai
+[ibrahimijai](https://github.com/ibrahimijai)
 MARCH 2026
